@@ -1,26 +1,95 @@
-<!-- public/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NFT Deployment</title>
+  <title>NFT Minting</title>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>NFT Deployment</h1>
-  <button id="deployButton">Start Deployment</button>
+  <h1>NFT Minting</h1>
+  <button id="deployButton" disabled>Start NFT Minting</button>
+
+  <div id="ton-connect" style="margin-top: 10px;"></div>
+
+  <div id="nftCount" style="margin-top: 10px;"></div>
 
   <script>
-    document.getElementById('deployButton').addEventListener('click', async () => {
+  
+    let maxNfts = 10004;
+
+    async function fetchNftCount() {
       try {
-        const response = await fetch('/start');
-        const result = await response.text();
-        alert(result);
+        const response = await fetch('http://localhost:3000/nft-count');
+        const data = await response.json();
+        console.log('NFT count:', data);
+        const availableNfts = maxNfts - data.nftsMinted;
+        console.log('Available NFTs:', availableNfts);
+        document.getElementById('nftCount').textContent = `${availableNfts} NFTs are available for minting`;
+        if (availableNfts <= 0) {
+          document.getElementById('deployButton').disabled = true;
+          alert('No more NFTs can be minted');
+        }
       } catch (error) {
-        console.error('Error:', error);
-        alert('Deployment failed. Check console for details.');
+        console.error('Error fetching NFT count:', error);
       }
+    }
+    fetchNftCount();
+  </script>  
+  <script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'http://localhost:3000/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect'
     });
+
+    let connectedWalletAddress = null;
+    
+    async function connectToWallet() {
+        try {
+            const connectedWallet = await tonConnectUI.connectWallet();
+            // Do something with connectedWallet if needed
+            console.log("Wallet Connected Successfully");
+            console.log(connectedWallet);
+            console.log(`Connected Wallet's Address: ${connectedWallet.account.address}`);
+            console.log(`Type of sent address on /start: ${typeof connectedWalletAddress}`)
+
+            // Store the connected wallet's address
+            connectedWalletAddress = connectedWallet.account.address;
+
+            // Enable the deploy button when the wallet is connected
+            const deployButton = document.getElementById('deployButton');
+            deployButton.disabled = false;
+            deployButton.classList.remove('disabled');
+            deployButton.classList.add('enabled');
+
+        } catch (error) {
+            console.error("Error connecting to wallet:", error);
+        }
+    }
+
+    // Call the function
+    connectToWallet();
   </script>
+
+<script>
+  document.getElementById('deployButton').addEventListener('click', async () => {
+    if (!connectedWalletAddress) {
+      alert('Wallet not connected');
+      return;
+    }
+
+    try {
+      console.log(`Type of sent address on /start: ${typeof connectedWalletAddress}`)
+      const response = await fetch(`/start?address=${connectedWalletAddress}`);
+      console.log(`Sent this address on /start: ${connectedWalletAddress}`)
+      const result = await response.text();
+      alert(result);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Deployment failed. Check console for details.');
+    }
+  });
+</script>
 </body>
 </html>

@@ -1,0 +1,67 @@
+/* CSS for NFT Deployment page */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #1A0027; /* Deep purple background */
+    color: #FFFFFF; /* White text color */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    text-align: center;
+}
+  
+h1 {
+    color: #FFFFFF; /* White heading color */
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+  
+button {
+    border: none;
+    padding: 15px 30px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 25px;
+    transition: background-color 0.3s ease;
+    box-shadow: 0px 4px 15px rgba(213, 0, 249, 0.4);
+}
+  
+button:hover:enabled {
+    background-color: #C000E0; /* Darker magenta on hover */
+}
+  
+button:active:enabled {
+    background-color: #A000B5; /* Even darker magenta on active state */
+}
+  
+button:focus {
+    outline: none;
+}
+  
+button.disabled {
+    background-color: #555; /* Gray color for disabled state */
+    color: #999; /* Lighter gray text color */
+    cursor: not-allowed;
+    box-shadow: none; /* No shadow for disabled state */
+}
+  
+button.enabled {
+    background-color: #D500F9; /* Bright magenta button color */
+    color: #FFFFFF;
+    box-shadow: 0px 4px 15px rgba(213, 0, 249, 0.4);
+}
+  
+@media (max-width: 600px) {
+    h1 {
+        font-size: 2em;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 0.9em;
+    }
+}
+

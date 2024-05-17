@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFT Minting</title>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h1>NFT Minting</h1>
+  <button id="deployButton" class="disabled" disabled>Start NFT Minting</button>
+
+  <div id="ton-connect" style="margin-top: 10px;"></div>
+  <div id="error-message" style="color: red; margin-top: 10px;"></div> <!-- Error message placeholder -->
+
+  <script>
+    const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+        manifestUrl: 'http://localhost:3000/tonconnect-manifest.json',
+        buttonRootId: 'ton-connect'
+    });
+
+    let connectedWalletAddress = null;
+
+    async function connectToWallet() {
+        try {
+            const connectedWallet = await tonConnectUI.connectWallet();
+            // Do something with connectedWallet if needed
+            console.log("Wallet Connected Successfully");
+            console.log(connectedWallet);
+            console.log(`Connected Wallet's Address: ${connectedWallet.account.address}`);
+
+            // Store the connected wallet's address
+            connectedWalletAddress = connectedWallet.account.address;
+
+            // Enable the deploy button when the wallet is connected
+            const deployButton = document.getElementById('deployButton');
+            deployButton.disabled = false;
+            deployButton.classList.remove('disabled');
+            deployButton.classList.add('enabled');
+
+            // Clear any existing error message
+            document.getElementById('error-message').textContent = '';
+        } catch (error) {
+            console.error("Error connecting to wallet:", error);
+
+            // Display error message
+            document.getElementById('error-message').textContent = 'Error: Wallet was not connected. Please try again.';
+        }
+    }
+
+    // Call the function
+    connectToWallet().catch(error => {
+        console.error("Error connecting to wallet:", error);
+        document.getElementById('error-message').textContent = 'Unexpected error occurred. Please try again later.';
+    });
+  </script>
+
+  <script>
+    document.getElementById('deployButton').addEventListener('click', async () => {
+      if (!connectedWalletAddress) {
+        alert('Wallet not connected');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/start?address=${connectedWalletAddress}`);
+        const result = await response.text();
+        alert(result);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Deployment failed. Check console for details.');
+      }
+    });
+  </script>
+</body>
+</html>

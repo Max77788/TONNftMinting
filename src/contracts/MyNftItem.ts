@@ -1,13 +1,28 @@
 import { internal, SendMode, Address, Cell, beginCell, toNano } from "ton-core";
 import { OpenedWallet } from "utils";
-import { NftCollection, mintParams } from "./NftCollection";
+import { NftCollection } from "./NftCollection";
 import { TonClient } from "ton";
 
-export class NftItem {
-  private collection: NftCollection;
 
-  constructor(collection: NftCollection) {
-    this.collection = collection;
+export type mintParams = {
+    queryId: number | null,
+    itemOwnerAddress: Address,
+    itemIndex: number,
+    amount: bigint,
+    commonContentUrl: string
+  }
+
+
+
+export class NftItem {
+  private collection_address: Address;
+
+  constructor(collection_address: Address | string) {
+    if (typeof collection_address === "string") {
+      this.collection_address = Address.parse(collection_address);
+    } else {
+    this.collection_address = collection_address;
+  } 
   }
 
   public async deploy(
@@ -21,8 +36,8 @@ export class NftItem {
       messages: [
         internal({
           value: "0.05",
-          to: this.collection.address,
-          body: this.collection.createMintBody(params),
+          to: this.collection_address,
+          body: this.createMintBody(params),
         }),
       ],
       sendMode: SendMode.IGNORE_ERRORS + SendMode.PAY_GAS_SEPARATELY,
@@ -31,9 +46,13 @@ export class NftItem {
   }
 
   static async getAddressByIndex(
-    collectionAddress: Address,
+    collectionAddress: Address | string,
     itemIndex: number
   ): Promise<Address> {
+    if (typeof collectionAddress === "string") {
+      collectionAddress = Address.parse(collectionAddress);
+    }
+
     const client = new TonClient({
       endpoint: "https://testnet.toncenter.com/api/v2/jsonRPC",
       apiKey: process.env.TONCENTER_API_KEY});
@@ -85,6 +104,29 @@ export class NftItem {
         return seqno;
       }
 
+    
+    public async topUpBalance(
+        wallet: OpenedWallet
+      ): Promise<number> {
+        const feeAmount = 0.026 // approximate value of fees for 1 transaction in our case 
+        const seqno = await wallet.contract.getSeqno();
+        const amount = feeAmount;
+    
+        await wallet.contract.sendTransfer({
+          seqno,
+          secretKey: wallet.keyPair.secretKey,
+          messages: [
+            internal({
+              value: amount.toString(),
+              to: this.collection_address.toString({ bounceable: false }),
+              body: new Cell(),
+            }),
+          ],
+          sendMode: SendMode.PAY_GAS_SEPARATELY + SendMode.IGNORE_ERRORS,
+        });
+    
+        return seqno;
+      }
 
 
     static createTransferBody(params: {
@@ -104,6 +146,24 @@ export class NftItem {
 
         return msgBody.endCell();
     
+      }
+
+    public createMintBody(params: mintParams): Cell {
+        const body = beginCell();
+        body.storeUint(1, 32);
+        body.storeUint(params.queryId || 0, 64);
+        body.storeUint(params.itemIndex, 64);
+        body.storeCoins(params.amount);
+    
+        const nftItemContent = beginCell();
+        nftItemContent.storeAddress(params.itemOwnerAddress);
+    
+        const uriContent = beginCell();
+        uriContent.storeBuffer(Buffer.from(params.commonContentUrl));
+        nftItemContent.storeRef(uriContent.endCell());
+    
+        body.storeRef(nftItemContent.endCell());
+        return body.endCell();
       }
   }
 

@@ -6,8 +6,6 @@ import path from "path";
 
 dotenv.config();
 
-console.log(`Pinata API Key: ${process.env.PINATA_API_KEY}`)
-
 export async function uploadFolderToIPFS(folderPath: string): Promise<string> {
     const pinata = new pinataSDK({
       pinataApiKey: process.env.PINATA_API_KEY,
