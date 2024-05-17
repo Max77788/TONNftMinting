@@ -1,0 +1,26 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NFT Deployment</title>
+</head>
+<body>
+  <h1>NFT Deployment</h1>
+  <button id="deployButton">Start Deployment</button>
+
+  <script>
+    document.getElementById('deployButton').addEventListener('click', async () => {
+      try {
+        const response = await fetch('/start');
+        const result = await response.text();
+        alert(result);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Deployment failed. Check console for details.');
+      }
+    });
+  </script>
+</body>
+</html>
