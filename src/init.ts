@@ -97,9 +97,11 @@ interface CountData {
     res.json({ nftsMinted });
   }
 
+  /*
   async function getTonManifestJSON(req: Request, res: Response) {
     const { tonManiJSON } = await readCount('./public/tonconnect-manifest.json');
     res.json({ tonManiJSON });
   }
-  
+  */
+
   export { init, getNftCount, getTonManifestJSON };
