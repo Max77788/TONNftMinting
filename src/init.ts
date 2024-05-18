@@ -3,6 +3,7 @@ import * as dotenv from "dotenv";
 import { updateMetadataFiles, uploadFolderToIPFS } from "../metadata";
 import { openWallet } from "./utils";
 import { Address } from "ton-core";
+import { PathLike } from 'fs';
 import { waitSeqno } from "./delay";
 import { NftCollection } from "./contracts/NftCollection";
 import { toNano } from "ton-core";
@@ -18,9 +19,9 @@ interface CountData {
     browserPlayerWalletAddress?: string;
   }
   
-  async function readCount(): Promise<CountData> {
+  async function readCount(path: PathLike): Promise<CountData> {
     try {
-      const data = await fs.readFile('./src/count.json', 'utf8');
+      const data = await fs.readFile(path, 'utf8');
       const json: CountData = JSON.parse(data);
       return json;
     } catch (error) {
@@ -42,7 +43,7 @@ interface CountData {
     const COLLECTION_ADDRESS = "kQAmZdYJyzBsDhu-_I8qnv6zvwlJUyp_eoXvhqUhXfqD-jfp";
     const wallet = await openWallet(process.env.MNEMONIC!.split(" "), true);
   
-    let { nftsMinted: total_minted_sofar, browserPlayerWalletAddress: savedWalletAddress } = await readCount();
+    let { nftsMinted: total_minted_sofar, browserPlayerWalletAddress: savedWalletAddress } = await readCount('./src/count.json');
     console.log(`Total minted so far read: ${total_minted_sofar}`);
     if (savedWalletAddress) {
       console.log(`Saved browser player wallet address: ${savedWalletAddress}`);
@@ -92,8 +93,13 @@ interface CountData {
   }
   
   async function getNftCount(req: Request, res: Response) {
-    const { nftsMinted } = await readCount();
+    const { nftsMinted } = await readCount('./src/count.json');
     res.json({ nftsMinted });
   }
+
+  async function getTonManifestJSON(req: Request, res: Response) {
+    const { tonManiJSON } = await readCount('./public/tonconnect-manifest.json');
+    res.json({ tonManiJSON });
+  }
   
-  export { init, getNftCount };
+  export { init, getNftCount, getTonManifestJSON };
