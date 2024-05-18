@@ -104,4 +104,4 @@ interface CountData {
   }
   */
 
-  export { init, getNftCount, getTonManifestJSON };
+  export { init, getNftCount };
