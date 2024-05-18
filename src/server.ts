@@ -8,7 +8,7 @@ import { Address } from 'ton-core';
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // Use the port provided by Heroku
 
 app.use(express.static('public'));
 
@@ -51,5 +51,5 @@ app.get('/nft-count', getNftCount);
 
 
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running at port: ${port}`);
 });
