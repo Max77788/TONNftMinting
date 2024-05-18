@@ -93,11 +93,12 @@ async function init(browserPlayerWalletAddress: Address | string) {
     console.log("NFT Item created");
 
     try {
-        console.log(`Start top-up balance`);
-        const seqno_topup = await retryWithBackoff(() => nftItem.topUpBalance(wallet), 5);
-        await waitSeqno(seqno_topup, wallet);
+        console.log(`Start top-up balance(removed for now)`);
+        // const seqno_topup = await retryWithBackoff(() => nftItem.topUpBalance(wallet), 5);
+        // await waitSeqno(seqno_topup, wallet);
 
-        console.log(`Balance top-upped`);
+        console.log(`Balance top-upped(removed for now)`);
+        console.log(`Start .deploy() method of NFT Item`)
         const seqno = await retryWithBackoff(() => nftItem.deploy(wallet, mintParams), 5);
         console.log(`Successfully deployed NFT Item`);
         await waitSeqno(seqno, wallet);
