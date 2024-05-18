@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc --skipLibCheck",
     "dev": "yarn build && nodemon ./dist/src/server.js",
-    "start": "nodemon ./dist/src/server.js"
+    "start": "node ./dist/src/server.js"
   },
   "dependencies": {
     "@pinata/sdk": "^2.1.0",
