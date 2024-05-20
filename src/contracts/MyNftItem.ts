@@ -9,7 +9,8 @@ export type mintParams = {
     itemOwnerAddress: Address,
     itemIndex: number,
     amount: bigint,
-    commonContentUrl: string
+    commonContentUrl: string,
+    imageLink: string
   }
 
 

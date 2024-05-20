@@ -51,5 +51,5 @@ app.get('/nft-count', getNftCount);
 
 
 app.listen(port, () => {
-  console.log(`Server is running at port: ${port}`);
+  console.log(`Server is running at port: http://localhost:${port}`);
 });

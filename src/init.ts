@@ -73,11 +73,12 @@ async function init(browserPlayerWalletAddress: Address | string) {
         console.log(`Saved browser player wallet address: ${savedWalletAddress}`);
     }
 
-    if (total_minted_sofar >= 10005) {
+    if (total_minted_sofar >= 10008) {
         throw new Error('No more NFTs can be minted');
     }
 
     const file_name = "xxx_insect.png";
+    const IMAGE_LINK = "https://ipfs.io/ipfs/QmRWYjxAvjdbk4bEqv7Zkm13Lu9iFyLbHrZV5MctReK5Ue"
 
     console.log(`Start deploy of NFT Item`);
     const mintParams = {
@@ -86,6 +87,7 @@ async function init(browserPlayerWalletAddress: Address | string) {
         itemIndex: total_minted_sofar,
         amount: toNano("0.05"),
         commonContentUrl: file_name,
+        imageLink: IMAGE_LINK
     };
 
     const nftItem = new NftItem(COLLECTION_ADDRESS);
@@ -93,19 +95,25 @@ async function init(browserPlayerWalletAddress: Address | string) {
     console.log("NFT Item created");
 
     try {
-        console.log(`Start top-up balance(removed for now)`);
+        // console.log(`Start top-up balance(removed for now)`);
+        console.log(`Start top-up balances`);
+        const seqno_topup = await nftItem.topUpBalance(wallet);
         // const seqno_topup = await retryWithBackoff(() => nftItem.topUpBalance(wallet), 5);
-        // await waitSeqno(seqno_topup, wallet);
+        await waitSeqno(seqno_topup, wallet);
 
-        console.log(`Balance top-upped(removed for now)`);
+        // console.log(`Balance top-upped(removed for now)`);
+        console.log(`Balance top-upped`);
+
         console.log(`Start .deploy() method of NFT Item`)
-        const seqno = await retryWithBackoff(() => nftItem.deploy(wallet, mintParams), 5);
+        const seqno = await nftItem.deploy(wallet, mintParams)
+        // const seqno = await retryWithBackoff(() => nftItem.deploy(wallet, mintParams), 5);
         console.log(`Successfully deployed NFT Item`);
         await waitSeqno(seqno, wallet);
 
         const nftToSendAddress = await NftItem.getAddressByIndex(COLLECTION_ADDRESS, total_minted_sofar);
 
-        await retryWithBackoff(() => NftItem.transfer(wallet, nftToSendAddress, browserPlayerWalletAddress), 5);
+        await NftItem.transfer(wallet, nftToSendAddress, browserPlayerWalletAddress);
+        // await retryWithBackoff(() => NftItem.transfer(wallet, nftToSendAddress, browserPlayerWalletAddress), 5);
 
         console.log(`Successfully transferred nft with address ${nftToSendAddress} to user with address: ${browserPlayerWalletAddress}`);
 
@@ -117,6 +125,7 @@ async function init(browserPlayerWalletAddress: Address | string) {
 
     } catch (error) {
         console.error('Error during NFT minting process:', error);
+        throw new Error('Initialization failed. Please try again later.');
     }
 }
 

@@ -65,6 +65,7 @@ async function init(browserPlayerWalletAddress: Address | string) {
     itemIndex: total_minted_sofar,
     amount: toNano("0.05"),
     commonContentUrl: file_name,
+    imageLink: "papapa"
   };
 
   const nftItem = new NftItem(COLLECTION_ADDRESS);
