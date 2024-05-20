@@ -86,7 +86,7 @@
       const response = await fetch(`/start?address=${connectedWalletAddress}`);
       console.log(`Sent this address on /start: ${connectedWalletAddress}`)
       const result = await response.text();
-      alert(result);
+      alert("NFT Minting Successful");
     } catch (error) {
       console.error('Error:', error);
       alert('Deployment failed. Check console for details.');
