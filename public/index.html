@@ -21,7 +21,7 @@
 
     async function fetchNftCount() {
       try {
-        const response = await fetch('https://nft-ton-insects-6cdd4b5e4c5a.herokuapp.com/nft-count');
+        const response = await fetch('http://nft.insects.vip/nft-count');
         const data = await response.json();
         console.log('NFT count:', data);
         const availableNfts = maxNfts - data.nftsMinted;
@@ -39,7 +39,7 @@
   </script>  
   <script>
     const tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
-        manifestUrl: 'https://nft-ton-insects-6cdd4b5e4c5a.herokuapp.com/tonconnect-manifest.json',
+        manifestUrl: 'http://nft.insects.vip/tonconnect-manifest.json',
         buttonRootId: 'ton-connect'
     });
 
